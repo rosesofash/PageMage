@@ -175,7 +175,6 @@ a {
   flex: 1;
   height: calc(var(--card-w) * 1.33 + 11rem);
   perspective: 1400px;
-  transform-style: preserve-3d;
   cursor: grab;
   touch-action: pan-y;
   user-select: none;
@@ -212,7 +211,6 @@ a {
   left: 50%;
   width: var(--card-w);
   will-change: transform, opacity;
-  transform-style: preserve-3d;
 }
 .game-card__art {
   aspect-ratio: 3 / 4;
@@ -347,6 +345,11 @@ a {
 .chip.is-match {
   border-color: color-mix(in srgb, var(--accent) 70%, transparent);
   background: color-mix(in srgb, var(--accent) 16%, var(--bg-card));
+}
+.chip.is-gameplay {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-muted);
 }
 
 /* ---------- Book row ---------- */

@@ -80,7 +80,7 @@ async function showGame(game) {
   const detail = $("#game-detail");
   detail.hidden = false;
   paintCover($("#detail-cover"), game);
-  $("#detail-meta").textContent = `${game.year} · ${game.studio}`;
+  $("#detail-meta").textContent = [game.year, game.studio, game.pick && `${game.pick}'s pick`].filter(Boolean).join(" · ");
   $("#detail-title").textContent = game.title;
   $("#detail-synopsis").textContent = game.synopsis;
   $("#books-for").textContent = game.title;
@@ -88,8 +88,10 @@ async function showGame(game) {
     ["Genres", game.tags],
     ["Themes", game.themes],
     ["Tropes", game.tropes],
+    ["Gameplay", game.gameplay ?? []], // shown for context only; not used to match books
   ]
-    .map(([label, list]) => `<div><dt>${label}</dt><dd class="chips">${list.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</dd></div>`)
+    .filter(([, list]) => list.length)
+    .map(([label, list]) => `<div><dt>${label}</dt><dd class="chips">${list.map((t) => `<span class="chip${label === "Gameplay" ? " is-gameplay" : ""}">${esc(t)}</span>`).join("")}</dd></div>`)
     .join("");
 
   $("#books-status").textContent = "Searching Open Library…";

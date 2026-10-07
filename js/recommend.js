@@ -186,7 +186,8 @@ export async function recommendBooks(game) {
   const seenTitles = new Set();
   for (const b of candidates.sort((a, b) => b.score - a.score)) {
     const author = b.authors[0] ?? "";
-    const title = b.title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    const title = b.title.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "") // "Shōgun" = "Shogun"
+      .replace(/[^\p{L}\p{N}]+/gu, " ").trim();
     if (seenTitles.has(title) || (perAuthor.get(author) ?? 0) >= CONFIG.maxBooksPerAuthor) continue;
     seenTitles.add(title);
     perAuthor.set(author, (perAuthor.get(author) ?? 0) + 1);
