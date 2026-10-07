@@ -1,7 +1,7 @@
 // The recommendation engine:
 //   1. Fetch candidate books for each of the game's Open Library subjects.
-//   2. Clean each book's subjects into tags and keep its top N (the ones most related to the game).
-//   3. A book must share at least one genre (the game's `tags`) with the game; themes, tropes and subjects add to its score.
+//   2. Take each book's own top 10 tags (its first real subjects on Open Library).
+//   3. Recommend it only if those top tags match the game (count + genre rule in config.js).
 //   4. Score = tag match + rating + most read + want to read (weights in config.js).
 
 import { CONFIG } from "./config.js";
@@ -44,11 +44,14 @@ function sameWord(a, b) {
  * How well a book tag matches a game term: 1 = strong, 0.5 = partial or broad, 0 = no match.
  * Broad terms like "fantasy" or "science fiction" top out at 0.5, so specific overlaps ("post-apocalyptic") rank higher.
  */
+// The best score a game term can give: broad terms ("fantasy", "science fiction") cap at 0.5.
+const fullScore = (gameTerm) => (words(gameTerm).every((w) => GENERIC_WORDS.has(w)) ? 0.5 : 1);
+
 function tagSimilarity(bookTag, gameTerm) {
   const bookWords = words(bookTag);
   const termWords = words(gameTerm);
   if (!bookWords.length || !termWords.length) return 0;
-  const strong = termWords.every((w) => GENERIC_WORDS.has(w)) ? 0.5 : 1;
+  const strong = fullScore(gameTerm);
   if (bookTag === gameTerm) return strong;
   // every word of the game term appears in the book tag: "fantasy epic" ⊇ "epic fantasy", "dystopian" ⊇ "dystopia"
   if (termWords.every((w) => bookWords.some((v) => sameWord(w, v)))) return strong;
@@ -73,25 +76,34 @@ export function gameTerms(game) {
   return [...terms].map(([term, kind]) => ({ term, kind }));
 }
 
-/** Clean a book's raw subjects, then rank them by relevance to the game and keep the top N. */
+// Same tag in different wording: "dystopia" / "dystopias" / "dystopia fiction" → one tag.
+const TAG_FILLER = new Set(["fiction", "fictional", "stories", "story", "tales", "tale", "novel", "novels", "literature", "general"]);
+const tagKey = (tag) =>
+  words(tag).filter((w) => !TAG_FILLER.has(w)).map((w) => w.replace(/s$/, "")).sort().join(" ") || tag;
+
+/**
+ * A book's own top N tags: its first N real subjects, in Open Library's order (the main subjects tend to
+ * come first), after dropping catalog noise and duplicates. Each tag records how well it matches the game.
+ */
 export function topTagsForBook(rawSubjects = [], terms) {
   const cleaned = [];
+  const seen = new Set();
   for (const raw of rawSubjects) {
+    if (cleaned.length === CONFIG.topTagsPerBook) break;
     if (CONFIG.noiseSubjects.some((re) => re.test(raw))) continue;
     const tag = normalizeTag(raw);
-    if (!tag || tag.length > 40 || cleaned.some((t) => t.tag === tag)) continue;
+    if (!tag || tag.length > 40 || seen.has(tagKey(tag))) continue;
+    seen.add(tagKey(tag));
     let best = { score: 0, term: null, kind: null };
     let isGenre = false; // tracked separately: a tag can match a genre and, more strongly, a theme
     for (const { term, kind } of terms) {
       const score = tagSimilarity(tag, term);
       if (score > best.score) best = { score, term, kind };
-      if (score > 0 && kind === "genre") isGenre = true;
+      if (kind === "genre" && score > 0 && score === fullScore(term)) isGenre = true; // half-matches don't count as a shared genre
     }
-    cleaned.push({ tag, ...best, isGenre, order: cleaned.length });
+    cleaned.push({ tag, ...best, isGenre });
   }
-  // Open Library doesn't rank subjects, so "top" = most related to the game first, then original order.
-  cleaned.sort((a, b) => b.score - a.score || a.order - b.order);
-  return cleaned.slice(0, CONFIG.topTagsPerBook);
+  return cleaned;
 }
 
 function bayesianRating(avg = 0, count = 0) {
@@ -134,11 +146,15 @@ export async function recommendBooks(game) {
   const candidates = [];
   for (const doc of docs.values()) {
     if (CONFIG.requireCover && !doc.cover_i) continue;
+    if (CONFIG.blockedTitles.some((re) => re.test(doc.title) || re.test(englishTitle(doc)))) continue;
+    if ((doc.ratings_count ?? 0) < CONFIG.minRatings) continue;
+    if ((doc.want_to_read_count ?? 0) < CONFIG.minWantToRead) continue;
+    if ((doc.already_read_count ?? 0) < CONFIG.minAlreadyRead) continue;
     if ((doc.subject ?? []).some((s) => CONFIG.excludedSubjects.some((re) => re.test(s)))) continue;
 
     const topTags = topTagsForBook(doc.subject, terms);
     const matches = topTags.filter((t) => t.score > 0);
-    if (!matches.some((t) => t.isGenre)) continue; // must share a genre
+    if (CONFIG.requireGenreMatch && !matches.some((t) => t.isGenre)) continue; // must share a genre
     if (matches.length < CONFIG.minTagMatches) continue;
 
     // Count each game term once, so "epic fantasy" + "fantasy epic" + "fiction fantasy epic" isn't 3 matches.

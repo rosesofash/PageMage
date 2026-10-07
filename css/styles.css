@@ -26,6 +26,8 @@ body {
   font-family: var(--font-body);
   line-height: 1.55;
   overflow-x: hidden;
+  display: flex; /* footer sits at the bottom of the window, even on short pages */
+  flex-direction: column;
 }
 
 h1, h2, h3 {
@@ -154,11 +156,15 @@ a {
   max-width: 34rem;
 }
 
+main {
+  flex: 1;
+}
+
 .site-footer {
   text-align: center;
   color: var(--text-muted);
   font-size: 0.85rem;
-  padding: 3rem 1rem 2rem;
+  padding: 4rem 1rem 1.25rem;
 }
 
 /* ---------- 3D carousel ---------- */
@@ -538,37 +544,6 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.small-modal {
-  width: min(400px, calc(100vw - 2rem));
-}
-.small-modal form {
-  display: grid;
-  gap: 1rem;
-  padding: 2rem;
-}
-.small-modal p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-label {
-  display: grid;
-  gap: 0.35rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-input {
-  padding: 0.65rem 0.8rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font: inherit;
-}
-input:focus {
-  outline: none;
-  border-color: var(--accent);
 }
 
 .drawer {

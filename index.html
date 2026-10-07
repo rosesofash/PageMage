@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Game2Books</title>
+    <title>PageMage</title>
     <meta name="description" content="Pick a game you love and find books with a similar story." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,12 +19,11 @@
     <div class="bg-glow" aria-hidden="true"></div>
 
     <header class="site-header">
-      <a class="logo" href="./">Game<span>2</span>Books</a>
+      <a class="logo" href="./">Page<span>Mage</span></a>
       <nav class="site-nav">
         <button class="btn btn-ghost" id="my-list-btn" type="button">
           My List <span class="badge" id="saved-count">0</span>
         </button>
-        <button class="btn" id="account-btn" type="button">Log in</button>
       </nav>
     </header>
 
@@ -87,24 +86,6 @@
           </div>
         </div>
       </div>
-    </dialog>
-
-    <!-- Login (demo only) -->
-    <dialog class="modal small-modal" id="login-modal" aria-labelledby="login-title">
-      <button class="modal-close" type="button" data-close aria-label="Close">×</button>
-      <form id="login-form" method="dialog">
-        <h2 id="login-title">Log in</h2>
-        <p class="muted" id="login-reason">Demo login: any username works and nothing is sent anywhere.</p>
-        <label>
-          Username
-          <input name="username" required autocomplete="username" maxlength="40" />
-        </label>
-        <label>
-          Password
-          <input name="password" type="password" autocomplete="current-password" placeholder="(not checked yet)" />
-        </label>
-        <button class="btn btn-primary" type="submit">Log in</button>
-      </form>
     </dialog>
 
     <!-- Saved books -->

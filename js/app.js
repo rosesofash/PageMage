@@ -17,9 +17,7 @@ const state = {
   books: [],
   openBook: null,
   saved: [],
-  user: null,
   requestId: 0,
-  afterLogin: null, // action to retry once the user logs in
 };
 
 /* ---------- Game covers ---------- */
@@ -192,11 +190,6 @@ function updateSaveButton() {
 $("#save-book-btn").addEventListener("click", () => toggleSave(state.openBook));
 
 async function toggleSave(book) {
-  if (!state.user) {
-    state.afterLogin = () => toggleSave(book);
-    openLogin("Log in to save books to your list.");
-    return;
-  }
   if (isSaved(book)) {
     state.saved = await store.removeBook(book.key);
     toast(`Removed “${book.title}”`);
@@ -208,55 +201,11 @@ async function toggleSave(book) {
   renderSavedList();
 }
 
-/* ---------- Account (demo) ---------- */
-
-function openLogin(reason) {
-  $("#login-reason").textContent = reason ?? "Demo login: any username works and nothing is sent anywhere.";
-  $("#login-modal").showModal();
-  $("#login-form").username.focus();
-}
-
-$("#login-form").addEventListener("submit", async (e) => {
-  const username = e.target.username.value.trim();
-  if (!username) return e.preventDefault();
-  state.user = await store.login(username);
-  state.saved = await store.getSavedBooks();
-  e.target.reset();
-  renderAccount();
-  toast(`Welcome, ${state.user.username}!`);
-  const next = state.afterLogin;
-  state.afterLogin = null;
-  next?.();
-});
-
-$("#login-modal").addEventListener("close", () => {
-  if (!state.user) state.afterLogin = null;
-});
-
-$("#account-btn").addEventListener("click", async () => {
-  if (!state.user) return openLogin();
-  await store.logout();
-  state.user = null;
-  state.saved = [];
-  renderAccount();
-  toast("Logged out");
-});
-
-function renderAccount() {
-  $("#account-btn").textContent = state.user ? `Log out (${state.user.username})` : "Log in";
-  renderSavedList();
-  updateSaveButton();
-}
-
 /* ---------- Saved list ---------- */
 
 function renderSavedList() {
   $("#saved-count").textContent = state.saved.length;
   const list = $("#saved-list");
-  if (!state.user) {
-    list.innerHTML = `<p class="muted">Log in to keep a reading list.</p><button class="btn btn-primary" type="button" data-action="login">Log in</button>`;
-    return;
-  }
   if (!state.saved.length) {
     list.innerHTML = `<p class="muted">Nothing saved yet. Open a book and tap “Save to my list”.</p>`;
     return;
@@ -281,10 +230,7 @@ function renderSavedList() {
 $("#saved-list").addEventListener("click", async (e) => {
   const target = e.target.closest("button");
   if (!target) return;
-  if (target.dataset.action === "login") {
-    $("#list-modal").close();
-    openLogin();
-  } else if (target.dataset.open) {
+  if (target.dataset.open) {
     $("#list-modal").close();
     openBook(state.saved[Number(target.dataset.open)]);
   } else if (target.dataset.remove) {
@@ -320,10 +266,9 @@ function toast(message) {
 
 /* ---------- Start ---------- */
 
-state.user = await store.getCurrentUser();
 state.saved = await store.getSavedBooks();
-renderAccount();
+renderSavedList();
 
-// Deep links: index.html#hollow-knight opens that game directly.
+// Deep links: index.html#signalis opens that game directly.
 const linked = GAMES.findIndex((g) => g.id === location.hash.slice(1));
 if (linked >= 0) carousel.select(linked);
