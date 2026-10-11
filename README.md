@@ -4,6 +4,8 @@ Ash &amp; Eddie's project to encourage gamers to find books they could read and 
 Pick a game from the 3D wheel, see its genres, themes and tropes, and get book recommendations from
 [Open Library](https://openlibrary.org/developers/api) that share its story.
 
+(The extra contributor was an accidental login on my computer and the only commit done was a test)
+
 ## Run it locally
 
 The app uses JavaScript modules, so it has to be served over `http://`. Double-clicking `index.html` won't work.
