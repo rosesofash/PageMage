@@ -5,19 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PageMage</title>
     <meta name="description" content="Pick a game you love and find books with a similar story." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="css/styles.css" />
     <script type="module" src="js/app.js"></script>
   </head>
 
   <body>
-    <div class="bg-glow" aria-hidden="true"></div>
-
     <header class="site-header">
       <a class="logo" href="./">Page<span>Mage</span></a>
       <nav class="site-nav">
@@ -30,18 +22,23 @@
     <main>
       <section class="hero">
         <h1>Loved the story? <span class="accent-text">Read the next one.</span></h1>
-        <p>Spin the wheel, pick a game, and we'll find books with the same kind of story.</p>
+        <p>Pick a game and we'll find books with the same kind of story.</p>
       </section>
 
       <!-- 3D game wheel -->
       <section class="carousel" aria-label="Choose a game">
-        <button class="carousel-nav" id="prev-game" type="button" aria-label="Previous game">‹</button>
+        <button class="carousel-nav" id="prev-game" type="button" aria-label="Previous game">
+          <img src="img/navArrow.png" alt="" aria-hidden="true" />
+        </button>
         <div class="carousel-stage" id="carousel-stage" role="listbox" tabindex="0" aria-label="Games"></div>
-        <button class="carousel-nav" id="next-game" type="button" aria-label="Next game">›</button>
+        <button class="carousel-nav" id="next-game" type="button" aria-label="Next game">
+          <img src="img/navArrow.png" alt="" aria-hidden="true" />
+        </button>
       </section>
       <p class="carousel-hint">
         <span id="front-title" class="front-title"></span>
-        <span class="muted">Scroll, drag, or use ← → · click to choose</span>
+        <span class="muted">Scroll, drag, or use ← →</span>
+        <button class="select-game" id="select-game" type="button">SELECT</button>
       </p>
 
       <!-- Selected game + its book recommendations -->
@@ -71,7 +68,9 @@
 
     <!-- Book popup -->
     <dialog class="modal book-modal" id="book-modal" aria-labelledby="book-modal-title">
-      <button class="modal-close" type="button" data-close aria-label="Close">×</button>
+      <button class="modal-close" type="button" data-close aria-label="Close">
+        <img src="img/exitButton.png" alt="" aria-hidden="true" />
+      </button>
       <div class="book-modal__body">
         <img class="book-modal__cover" id="book-modal-cover" alt="" />
         <div class="book-modal__info">
@@ -81,7 +80,10 @@
           <div class="chips" id="book-modal-tags"></div>
           <div class="book-modal__desc" id="book-modal-desc"></div>
           <div class="book-modal__actions">
-            <button class="btn btn-primary" id="save-book-btn" type="button">♡ Save to my list</button>
+            <button class="btn btn-primary" id="save-book-btn" type="button">
+              <img src="img/heartLine.png" alt="" aria-hidden="true" />
+              <span>Save to my list</span>
+            </button>
             <div class="store-links" id="book-modal-links"></div>
           </div>
         </div>
@@ -90,7 +92,9 @@
 
     <!-- Saved books -->
     <dialog class="modal drawer" id="list-modal" aria-labelledby="list-title">
-      <button class="modal-close" type="button" data-close aria-label="Close">×</button>
+      <button class="modal-close" type="button" data-close aria-label="Close">
+        <img src="img/exitButton.png" alt="" aria-hidden="true" />
+      </button>
       <div class="modal-inner">
         <h2 id="list-title">My reading list</h2>
         <div id="saved-list"></div>
@@ -100,3 +104,4 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>
 </html>
+
