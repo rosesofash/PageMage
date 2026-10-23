@@ -90,7 +90,7 @@ async function showGame(game) {
     .join("");
 
   $("#books-status").textContent = "Searching Open Library…";
-  $("#book-row").innerHTML = Array.from({ length: 6 }, () => `<div class="book-card is-skeleton"><div class="book-card__cover"></div><div class="line"></div><div class="line short"></div></div>`).join("");
+  $("#book-row").innerHTML = Array.from({ length: 6 }, () => `<div class="book-card is-skeleton"><div class="book-card__cover-wrap"><div class="book-card__cover"></div></div><div class="line"></div><div class="line short"></div></div>`).join("");
   detail.scrollIntoView({ behavior: "smooth", block: "start" });
 
   try {
@@ -117,7 +117,9 @@ function renderBooks(books) {
       const tags = [...(b.keyTags ?? b.matchedTags), ...b.tags.filter((t) => !b.matchedTags.includes(t))].slice(0, 3);
       return `
         <button class="book-card" type="button" data-book="${i}">
-          <img class="book-card__cover" src="${coverUrl(b.coverId, "M")}" alt="" loading="lazy" />
+          <span class="book-card__cover-wrap">
+            <img class="book-card__cover" src="${coverUrl(b.coverId, "M")}" alt="" loading="lazy" />
+          </span>
           <span class="book-card__title">${esc(b.title)}</span>
           <span class="book-card__author">${esc(b.authors[0] ?? "Unknown author")}</span>
           <span class="chips">${tags.map((t) => `<span class="chip${b.matchedTags.includes(t) ? " is-match" : ""}">${esc(t)}</span>`).join("")}</span>
@@ -215,7 +217,9 @@ function renderSavedList() {
       (b, i) => `
       <div class="saved-item">
         <button class="saved-item__main" type="button" data-open="${i}">
-          <img src="${coverUrl(b.coverId, "S")}" alt="" />
+          <span class="saved-item__cover-wrap">
+            <img src="${coverUrl(b.coverId, "S")}" alt="" />
+          </span>
           <span>
             <strong>${esc(b.title)}</strong>
             <span class="muted">${esc(b.authors[0] ?? "")}${b.savedFrom ? ` · for ${esc(b.savedFrom)}` : ""}</span>
