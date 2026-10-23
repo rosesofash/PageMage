@@ -84,10 +84,11 @@ export class Carousel {
     const angleStep = Math.max((Math.PI * 2) / this.count, Math.PI / 6);
     const n = this.count;
     this.cards.forEach((card, i) => {
+      const art = card.querySelector(".game-card__art");
       const offset = ((((i - this.position) % n) + n + n / 2) % n) - n / 2; // cards from the front, -n/2..n/2
       const angle = offset * angleStep;
       if (Math.abs(angle) > Math.PI) {
-        card.style.opacity = "0";
+        art.style.opacity = "0";
         card.style.pointerEvents = "none";
         return;
       }
@@ -98,9 +99,9 @@ export class Carousel {
       card.style.transform =
         `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${(Math.sin(angle) * 0.6).toFixed(3)}rad)`; // angled at the sides, facing us front and back
       const fade = Math.min(1, (Math.PI - Math.abs(angle)) / angleStep); // ease cards in/out at the very back
-      card.style.opacity = ((0.22 + 0.78 * depth ** 2) * fade).toFixed(3);
+      art.style.opacity = ((0.22 + 0.78 * depth ** 2) * fade).toFixed(3);
       card.style.zIndex = String(Math.round(depth * 100));
-      card.style.filter = depth < 0.98 ? `blur(${((1 - depth) * 2.5).toFixed(2)}px) saturate(${(0.4 + depth * 0.6).toFixed(2)})` : "none";
+      art.style.filter = depth < 0.98 ? `blur(${((1 - depth) * 2.5).toFixed(2)}px) saturate(${(0.4 + depth * 0.6).toFixed(2)})` : "none";
       card.style.pointerEvents = depth > 0.35 ? "auto" : "none";
     });
 

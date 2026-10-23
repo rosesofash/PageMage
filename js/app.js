@@ -225,7 +225,9 @@ function renderSavedList() {
             <span class="muted">${esc(b.authors[0] ?? "")}${b.savedFrom ? ` · for ${esc(b.savedFrom)}` : ""}</span>
           </span>
         </button>
-        <button class="icon-btn" type="button" data-remove="${i}" aria-label="Remove ${esc(b.title)}">×</button>
+        <button class="icon-btn" type="button" data-remove="${i}" aria-label="Remove ${esc(b.title)}">
+          <img src="img/exitButton.png" alt="" aria-hidden="true" />
+        </button>
       </div>`
     )
     .join("");
