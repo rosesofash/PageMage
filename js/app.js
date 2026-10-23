@@ -49,7 +49,6 @@ function renderGameCard(game) {
   const card = document.createElement("div");
   card.className = "game-card";
   card.id = `game-card-${game.id}`;
-  card.style.setProperty("--accent", game.accent);
   card.setAttribute("aria-label", game.title);
   card.innerHTML = `<div class="game-card__art"></div><div class="game-card__label">${esc(game.title)}</div>`;
   paintCover(card.querySelector(".game-card__art"), game);
@@ -61,7 +60,6 @@ const carousel = new Carousel($("#carousel-stage"), GAMES, {
   onSelect: showGame,
   onFrontChange: (game) => {
     $("#front-title").textContent = game.title;
-    if (!state.game) document.documentElement.style.setProperty("--accent", game.accent);
   },
 });
 $("#prev-game").addEventListener("click", () => carousel.step(-1));
@@ -73,7 +71,6 @@ async function showGame(game) {
   state.game = game;
   history.replaceState(null, "", `#${game.id}`);
   const requestId = ++state.requestId;
-  document.documentElement.style.setProperty("--accent", game.accent);
 
   const detail = $("#game-detail");
   detail.hidden = false;
@@ -145,18 +142,20 @@ async function openBook(book) {
   $("#book-modal-author").textContent = book.authors.length ? `by ${book.authors.slice(0, 3).join(", ")}` : "Unknown author";
 
   const stats = [
-    ["Rating", book.ratingAverage ? `★ ${book.ratingAverage.toFixed(2)} (${fmt.format(book.ratingCount)})` : "No ratings yet"],
+    ["Rating", book.ratingAverage ? `${book.ratingAverage.toFixed(2)} (${fmt.format(book.ratingCount)})` : "No ratings yet"],
     ["Readers", fmt.format(book.readingLogCount)],
     ["Want to read", fmt.format(book.wantToReadCount)],
     ["First published", book.year ?? "—"],
     ["Pages", book.pages ?? "—"],
   ];
-  $("#book-modal-stats").innerHTML = stats.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+  $("#book-modal-stats").innerHTML = stats
+    .map(([k, v]) => `<div><dt>${k}</dt><dd>${k === "Rating" && book.ratingAverage ? `<span class="rating-value"><img src="img/star.png" alt="" aria-hidden="true" />${esc(v)}</span>` : esc(v)}</dd></div>`)
+    .join("");
   $("#book-modal-tags").innerHTML = book.tags
     .map((t) => `<span class="chip${book.matchedTags?.includes(t) ? " is-match" : ""}">${esc(t)}</span>`)
     .join("");
   $("#book-modal-links").innerHTML = storeLinks(book)
-    .map((l) => `<a class="btn btn-ghost" href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`)
+    .map((l) => `<a class="btn btn-ghost" href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} <img class="link-arrow" src="img/arrow.png" alt="" aria-hidden="true" /></a>`)
     .join("");
   updateSaveButton();
 
@@ -183,7 +182,8 @@ function isSaved(book) {
 function updateSaveButton() {
   const saved = isSaved(state.openBook);
   const btn = $("#save-book-btn");
-  btn.textContent = saved ? "♥ Saved" : "♡ Save to my list";
+  btn.querySelector("img").src = saved ? "img/heartFill.png" : "img/heartLine.png";
+  btn.querySelector("span").textContent = saved ? "Saved" : "Save to my list";
   btn.classList.toggle("is-saved", saved);
 }
 
