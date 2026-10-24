@@ -64,6 +64,7 @@ const carousel = new Carousel($("#carousel-stage"), GAMES, {
 });
 $("#prev-game").addEventListener("click", () => carousel.step(-1));
 $("#next-game").addEventListener("click", () => carousel.step(1));
+$("#select-game").addEventListener("click", () => carousel.select(carousel.frontIndex));
 
 /* ---------- Game detail + recommendations ---------- */
 
